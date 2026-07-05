@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubble UI Components - Pendaftaran</title>
+  <!-- FontAwesome for original mockup icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --lav: #c9b8f0;
+      --sky: #8fd8f5;
+      --mint: #c3f0b0;
+      --pink: #f5c2e0;
+      --ink: #2c3550;
+      --bg1: #f0f4ff;
+      --bg2: #fcf1fa;
+      --bubble-glass: rgba(255, 255, 255, 0.45);
+      --bubble-border: rgba(255, 255, 255, 0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Quicksand', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(143, 216, 245, 0.4), transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(245, 194, 224, 0.4), transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(201, 184, 240, 0.35), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--ink);
+      padding: 40px 20px 80px;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 36px;
+      padding: 40px 30px;
+      box-shadow: 
+        0 24px 50px -15px rgba(106, 90, 205, 0.15),
+        inset 0 4px 6px rgba(255, 255, 255, 0.8);
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.3rem;
+      letter-spacing: .5px;
+      margin: 0 0 8px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #7155e2, #29a0cc, #f358b1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 2px 2px rgba(255, 255, 255, 0.5));
+    }
+
+    p.sub {
+      text-align: center;
+      color: #6a7396;
+      margin: 0 0 45px;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Grid Layout matching the mockup rows */
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-bottom: 35px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .form-group label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 12px;
+      padding-left: 14px;
+    }
+
+    .bubble-surface {
+      position: relative;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.8), transparent 45%),
+        linear-gradient(160deg, rgba(201, 184, 240, 0.4), rgba(143, 216, 245, 0.4) 55%, rgba(245, 194, 224, 0.4));
+      backdrop-filter: blur(12px) saturate(145%);
+      -webkit-backdrop-filter: blur(12px) saturate(145%);
+      border: 1px solid var(--bubble-border);
+      box-shadow:
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -8px 14px -6px rgba(106, 90, 205, 0.25),
+        0 10px 20px -8px rgba(106, 90, 205, 0.25),
+        0 3px 6px -2px rgba(106, 90, 205, 0.15);
+      overflow: visible;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    }
+
+    .bubble-surface:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 4px 8px rgba(255, 255, 255, 0.95),
+        inset 0 -10px 16px -5px rgba(106, 90, 205, 0.35),
+        0 14px 24px -6px rgba(106, 90, 205, 0.3),
+        0 4px 8px -1px rgba(106, 90, 205, 0.2);
+    }
+
+    /* Gloss highlight helper overlay */
+    .bubble-shine {
+      position: absolute;
+      top: 3px;
+      left: 12%;
+      right: 12%;
+      height: 35%;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    /* Inputs */
+    .bubble-input {
+      width: 100%;
+      padding: 15px 24px;
+      font-size: 0.95rem;
+      color: var(--ink);
+      font-weight: 600;
+      border-radius: 999px;
+      border: 1px solid var(--bubble-border);
+      background: radial-gradient(circle at 25% 20%, #ffffff, #f0f6ff 45%, #ffffff);
+      box-shadow:
+        inset 0 3px 5px rgba(255, 255, 255, 0.95),
+        inset 0 -4px 10px -5px rgba(106, 90, 205, 0.2),
+        0 8px 16px -6px rgba(106, 90, 205, 0.15);
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .bubble-input:focus {
+      border-color: #a894e6;
+      box-shadow:
+        inset 0 3px 5px rgba(255, 255, 255, 0.95),
+        inset 0 -4px 10px -5px rgba(106, 90, 205, 0.35),
+        0 10px 20px -5px rgba(106, 90, 205, 0.25);
+      transform: scale(1.01);
+    }
+
+    .bubble-input::placeholder {
+      color: #9aa3c9;
+      font-weight: 500;
+    }
+
+    .checkbox-layout {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .state-widget-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bubble-checkbox-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .bubble-checkbox-btn.odp {
+      background: 
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9), transparent 45%),
+        linear-gradient(135deg, rgba(220, 235, 255, 0.7), rgba(185, 215, 255, 0.5));
+    }
+
+    .bubble-checkbox-btn.dipilih {
+      background: 
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9), transparent 45%),
+        linear-gradient(135deg, #78a9f3, #4380e6);
+      box-shadow: 
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        0 8px 18px -4px rgba(67, 128, 230, 0.5);
+    }
+
+    .bubble-checkbox-btn.dipilih svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+    }
+
+    .state-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7b85af;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tooltip bubble balloon */
+    .tooltip-balloon {
+      position: absolute;
+      top: -38px;
+      right: -34px;
+      background: #ffffff;
+      border: 1px solid rgba(106, 90, 205, 0.15);
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #31366b;
+      box-shadow: 0 4px 12px rgba(106, 90, 205, 0.15);
+      pointer-events: none;
+      animation: tooltipBounce 2s infinite ease-in-out;
+    }
+
+    .tooltip-balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 20%;
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+
+    @keyframes tooltipBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.05); }
+    }
+
+    .radio-choices {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-top: 10px;
+    }
+
+    .bubble-radio-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #4b5275;
+      user-select: none;
+    }
+
+    .bubble-radio {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .bubble-radio .dot {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6051b8, #3491b8);
+      opacity: 0;
+      transform: scale(0.3);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+    }
+
+    .bubble-radio.on .dot {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .slider-container {
+      width: 100%;
+      padding-top: 5px;
+    }
+
+    .slider-track-wrap {
+      position: relative;
+      padding: 10px 4px;
+    }
+
+    .bubble-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c9b8f0, #8fd8f5, #c3f0b0);
+      outline: none;
+      border: none;
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -4px 8px -3px rgba(106, 90, 205, 0.3),
+        0 4px 10px -3px rgba(106, 90, 205, 0.15);
+    }
+
+    .bubble-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 25%, #ffffff, #eaf6ff 60%, #a2d6f5);
+      box-shadow:
+        0 4px 10px rgba(106, 90, 205, 0.35),
+        0 1px 3px rgba(106, 90, 205, 0.2);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .bubble-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+
+    .bubble-slider::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 25%, #ffffff, #eaf6ff 60%, #a2d6f5);
+      border: none;
+      box-shadow:
+        0 4px 10px rgba(106, 90, 205, 0.35),
+        0 1px 3px rgba(106, 90, 205, 0.2);
+      cursor: pointer;
+    }
+
+    .slider-bubble-val {
+      position: absolute;
+      top: -30px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 30% 25%, #ffffff, #e6f5ff 60%, #b2def7);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #31366b;
+      box-shadow: 
+        inset 0 1px 2px #fff,
+        0 4px 8px rgba(106, 90, 205, 0.2);
+    }
+
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 4px 0;
+      color: #8b92b6;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .hobbies-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .bubble-tag {
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #31366b;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .bubble-tag.selected {
+      background:
+        radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95), transparent 45%),
+        linear-gradient(160deg, rgba(195, 240, 176, 0.5), rgba(143, 216, 245, 0.5) 55%, rgba(201, 184, 240, 0.5));
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.95),
+        inset 0 -8px 14px -6px rgba(90, 169, 106, 0.25),
+        0 8px 18px -6px rgba(90, 169, 106, 0.35);
+      border-color: rgba(143, 216, 245, 0.9);
+      transform: scale(1.03);
+    }
+
+    /* Country Dropdown Drop-wrapper */
+    .select-wrapper {
+      position: relative;
+    }
+
+    .bubble-select {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      padding: 15px 24px;
+      font-size: 0.95rem;
+      color: var(--ink);
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7284b3;
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    /* Circular File Upload component matching image_36db88.png */
+    .file-upload-bubble {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9), transparent 45%),
+        linear-gradient(135deg, rgba(230, 242, 255, 0.6), rgba(195, 222, 255, 0.45));
+      border: 1px solid var(--bubble-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -8px 16px -4px rgba(106, 90, 205, 0.2),
+        0 10px 20px -8px rgba(106, 90, 205, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-bubble:hover {
+      transform: scale(1.05) translateY(-3px);
+    }
+
+    .file-upload-bubble i {
+      font-size: 1.5rem;
+      color: #7284b3;
+      margin-bottom: 4px;
+    }
+
+    .file-upload-bubble span {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #7284b3;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .preview-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-cover: cover;
+      border-radius: 50%;
+      display: none;
+      z-index: 2;
+    }
+
+    .preview-gloss {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.8), transparent 48%);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .submit-row-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      margin-top: 25px;
+      border-top: 1px solid rgba(106, 90, 205, 0.1);
+      padding-top: 35px;
+    }
+
+    /* Main "DAFTAR SEKARANG!" Button styled with beautiful gradient */
+    .submit-bubble-wrapper {
+      position: relative;
+    }
+
+    .pop-cta-balloon {
+      position: absolute;
+      top: -38px;
+      right: 25px;
+      background: #ffffff;
+      border: 1px solid rgba(106, 90, 205, 0.15);
+      border-radius: 12px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #31366b;
+      box-shadow: 0 4px 12px rgba(106, 90, 205, 0.15);
+      pointer-events: none;
+      white-space: nowrap;
+      animation: tooltipBounce 2.5s infinite ease-in-out;
+    }
+
+    .pop-cta-balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      right: 24%;
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+
+    /* Floating static bubble decoration on the left matching image_36db88.png */
+    .button-bubble-decoration {
+      position: absolute;
+      left: -40px;
+      top: -15px;
+      width: 50px;
+      height: 50px;
+      pointer-events: none;
+      z-index: 10;
+      filter: drop-shadow(0 4px 8px rgba(106, 90, 205, 0.15));
+    }
+
+    .submit-bubble-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 45px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #31366b;
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      background: 
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95), transparent 45%),
+        linear-gradient(135deg, #ccf3b0 0%, #b2ebf5 45%, #e1bef5 100%);
+      box-shadow:
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -10px 18px -6px rgba(106, 90, 205, 0.2),
+        0 14px 28px -10px rgba(106, 90, 205, 0.35),
+        0 4px 10px -2px rgba(106, 90, 205, 0.2);
+      user-select: none;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .submit-bubble-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow:
+        inset 0 4px 8px rgba(255, 255, 255, 0.95),
+        inset 0 -12px 22px -5px rgba(106, 90, 205, 0.3),
+        0 18px 34px -8px rgba(106, 90, 205, 0.4),
+        0 6px 14px -1px rgba(106, 90, 205, 0.25);
+    }
+
+    .submit-bubble-btn:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    /* Small Pill Control Row for Kembali & Reset */
+    .controls-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .bubble-pill-btn {
+      padding: 11px 26px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #31366b;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 999px;
+    }
+
+    .bubble-pill-btn:active {
+      transform: scale(0.94);
+    }
+
+    .bubble-pill-btn.popped {
+      animation: popShrink 0.35s ease forwards;
+    }
+
+    @keyframes popShrink {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .burst {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: burstOut 0.55s ease-out forwards;
+      z-index: 99;
+    }
+
+    @keyframes burstOut {
+      to {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.1);
+        opacity: 0;
+      }
+    }
+
+    .ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      pointer-events: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      transform: translate(-50%, -50%);
+      animation: ringOut 0.5s ease-out forwards;
+      z-index: 98;
+    }
+
+    @keyframes ringOut {
+      to {
+        width: 140px;
+        height: 140px;
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    /* Modal Styling for reference image_36db88.png and Success notification */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 53, 80, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(140%);
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-card h3 {
+      font-size: 1.4rem;
+      margin-top: 0;
+      color: var(--ink);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .modal-card p {
+      color: #5c6285;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .success-summary {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 15px 0;
+      font-size: 0.85rem;
+    }
+
+    .success-summary div {
+      margin-bottom: 6px;
+    }
+
+    .success-summary div:last-child {
+      margin-bottom: 0;
+    }
+
+    .ref-btn-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    footer {
+      text-align: center;
+      color: #9aa3c9;
+      font-size: 0.85rem;
+      margin-top: 40px;
+      font-weight: 600;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="app-container">
+    <h1>BUBBLE UI COMPONENTS - Pendaftaran</h1>
+    <p class="sub">Setiap interaksi meletup jadi gelembung dan kilau warna</p>
+
+    <form id="bubbleRegisterForm" onsubmit="handleDaftarSubmit(event)">
+      
+      <!-- ROW 1: Nama, Email, Sandi -->
+      <div class="form-row-3">
+        <!-- Nama Lengkap -->
+        <div class="form-group">
+          <label>Nama Lengkap:</label>
+          <div class="bubble-surface" style="border-radius:999px;">
+            <input type="text" id="fullname" class="bubble-input" placeholder="Masukkan Nama..." required>
+          </div>
+        </div>
+
+        <!-- Alamat Email -->
+        <div class="form-group">
+          <label>Alamat Email:</label>
+          <div class="bubble-surface" style="border-radius:999px;">
+            <input type="email" id="email" class="bubble-input" placeholder="example@bubble.com..." required>
+          </div>
+        </div>
+
+        <!-- Kata Sandi -->
+        <div class="form-group">
+          <label>Kata Sandi:</label>
+          <div class="bubble-surface" style="border-radius:999px;">
+            <input type="password" id="password" class="bubble-input" placeholder="Sangat Rahasia..." required>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Syarat, Paket, Slider -->
+      <div class="form-row-3">
+        
+        <!-- Setuju Syarat & Ketentuan -->
+        <div class="form-group">
+          <label>Setuju Syarat & Ketentuan</label>
+          <div class="checkbox-layout">
+            <!-- Left Widget: ODP (Unchecked State) -->
+            <div class="state-widget-container" onclick="setTermsState(false, this)">
+              <div class="bubble-checkbox-btn odp" id="checkboxOdp">
+                <!-- Glossy sparkle inside -->
+                <div class="bubble-shine"></div>
+              </div>
+              <span class="state-label">ODP</span>
+            </div>
+
+            <!-- Right Widget: DIPILIH (Checked State) -->
+            <div class="state-widget-container" onclick="setTermsState(true, this)" style="position:relative;">
+              <div class="tooltip-balloon" id="popTooltip" style="display:none;">POP!</div>
+              <div class="bubble-checkbox-btn" id="checkboxDipilih">
+                <div class="bubble-shine"></div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" id="checkIcon"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span class="state-label">DIPILIH</span>
+            </div>
+          </div>
+          <!-- Hidden real input for accessibility / standard forms -->
+          <input type="checkbox" id="termsChecked" required style="position:absolute; opacity:0; pointer-events:none;">
+        </div>
+
+        <!-- Pilih Paket -->
+        <div class="form-group">
+          <label>Pilih Paket:</label>
+          <div class="radio-choices" id="paketRadioGroup">
+            <!-- Paket A -->
+            <div class="bubble-radio-row" onclick="selectPaket('A', this)">
+              <span class="bubble-surface bubble-radio"><span class="dot"></span></span>
+              Paket A
+            </div>
+            <!-- Paket B -->
+            <div class="bubble-radio-row" onclick="selectPaket('B', this)">
+              <span class="bubble-surface bubble-radio on"><span class="dot"></span></span>
+              Paket B
+            </div>
+            <!-- Paket C -->
+            <div class="bubble-radio-row" onclick="selectPaket('C', this)">
+              <span class="bubble-surface bubble-radio"><span class="dot"></span></span>
+              Paket C
+            </div>
+          </div>
+        </div>
+
+        <!-- Contoh Slider -->
+        <div class="form-group">
+          <label>Contoh Slider:</label>
+          <div class="slider-container">
+            <div class="slider-track-wrap">
+              <!-- Float value bubble -->
+              <div class="slider-bubble-val" id="sliderValDisplay" style="left:70%;">7</div>
+              <input type="range" min="1" max="10" value="7" class="bubble-slider" id="sliderRange" oninput="updateSliderProgress(this)">
+            </div>
+            <div class="slider-ticks">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 3: Hobi, Pilih Negara, File Upload -->
+      <div class="form-row-3">
+        <!-- Hobi -->
+        <div class="form-group">
+          <label>Hobi:</label>
+          <div class="hobbies-wrap">
+            <div class="bubble-surface bubble-tag selected" onclick="toggleHobby('Membaca', this)">
+              <div class="bubble-shine"></div>Membaca
+            </div>
+            <div class="bubble-surface bubble-tag" onclick="toggleHobby('Berlari', this)">
+              <div class="bubble-shine"></div>Berlari
+            </div>
+            <div class="bubble-surface bubble-tag" onclick="toggleHobby('Menggambar', this)">
+              <div class="bubble-shine"></div>Menggambar
+            </div>
+            <div class="bubble-surface bubble-tag selected" onclick="toggleHobby('Musik', this)">
+              <div class="bubble-shine"></div>Musik
+            </div>
+            <div class="bubble-surface bubble-tag" onclick="toggleHobby('Film', this)">
+              <div class="bubble-shine"></div>Film
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilih Negara -->
+        <div class="form-group">
+          <label>Pilih Negara:</label>
+          <div class="select-wrapper">
+            <div class="bubble-surface" style="border-radius:999px;">
+              <select id="countrySelect" class="bubble-input bubble-select">
+                <option value="Indonesia">Indonesia</option>
+                <option value="Malaysia">Malaysia</option>
+                <option value="Singapura">Singapura</option>
+                <option value="Thailand">Thailand</option>
+              </select>
+              <div class="select-arrow">
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="form-group" style="align-items: center;">
+          <label style="padding-left:0;">File Upload</label>
+          <div class="file-upload-bubble" onclick="triggerAvatarUpload(this)">
+            <div class="preview-gloss"></div>
+            <!-- Uploaded Image preview overlay -->
+            <img id="avatarPreview" class="preview-img" alt="Avatar">
+            <div id="uploadPlaceholder" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+              <i class="fa-solid fa-camera"></i>
+              <span>Pilih Foto Profil</span>
+            </div>
+          </div>
+          <!-- Hidden file input -->
+          <input type="file" id="realFileInput" accept="image/*" style="display:none;" onchange="handleFileSelected(event)">
+        </div>
+      </div>
+
+      <!-- ROW 4: Action Buttons & Center CTA -->
+      <div class="submit-row-container">
+        
+        <!-- Main DAFTAR SEKARANG! component -->
+        <div class="submit-bubble-wrapper">
+          <div class="pop-cta-balloon">KLIK UNTUK POP!</div>
+          <!-- Static floating glass shard decoration on left matching mockup -->
+          <svg class="button-bubble-decoration" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shard 1 -->
+            <path d="M10 50 L30 30 L40 50 L20 60 Z" fill="rgba(255,255,255,0.7)" stroke="rgba(143,216,245,0.8)" stroke-width="2"/>
+            <!-- Shard 2 -->
+            <path d="M25 80 L35 65 L45 85 L30 90 Z" fill="rgba(245,194,224,0.6)" stroke="rgba(245,194,224,0.9)" stroke-width="2"/>
+            <!-- Main shiny micro-bubble -->
+            <circle cx="50" cy="50" r="18" fill="url(#glossGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2"/>
+            <defs>
+              <linearGradient id="glossGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="60%" stop-color="#bceaff"/>
+                <stop offset="100%" stop-color="#f5ccfa"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          
+          <button type="submit" class="submit-bubble-btn" id="daftarBtn" onclick="pop(this)">
+            DAFTAR SEKARANG!
+          </button>
+        </div>
+
+        <!-- Bottom Controls Row: Kembali, Reset -->
+        <div class="controls-row">
+          <button type="button" class="bubble-surface bubble-pill-btn" onclick="handleKembaliClick(this)">Kembali</button>
+          <button type="button" class="bubble-surface bubble-pill-btn" onclick="handleResetForm(this)">Reset</button>
+        </div>
+
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Design comparison modal (image_36db88.png) -->
+  <div class="ref-btn-float">
+    <button type="button" class="bubble-surface bubble-pill-btn" style="background:#fff; border: 1px solid rgba(106, 90, 205, 0.25); font-weight:800;" onclick="toggleReferenceModal(this)">
+      <i class="fa-solid fa-image"></i> Lihat Desain Referensi
+    </button>
+  </div>
+
+  <!-- MODAL: Success Register -->
+  <div class="modal-backdrop" id="successModal">
+    <div class="modal-card">
+      <h3>🎉 Pendaftaran Sukses!</h3>
+      <p>Selamat! Gelembung pendaftaran Anda telah berhasil diproses oleh awan server kami.</p>
+      
+      <div class="success-summary">
+        <div><strong>Nama Lengkap:</strong> <span id="resName"></span></div>
+        <div><strong>Email:</strong> <span id="resEmail"></span></div>
+        <div><strong>Paket:</strong> <span id="resPaket"></span></div>
+        <div><strong>Kekuatan/Slider:</strong> <span id="resSlider"></span> dari 10</div>
+        <div><strong>Hobi:</strong> <span id="resHobbies"></span></div>
+        <div><strong>Negara:</strong> <span id="resCountry"></span></div>
+      </div>
+
+      <button type="button" class="bubble-surface bubble-pill-btn" style="width:100%; text-align:center; background:linear-gradient(90deg, #c3f0b0, #8fd8f5); font-weight:800; border:1px solid #fff;" onclick="closeModal('successModal')">
+        Hore! Terima Kasih
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Reference Image Compare -->
+  <div class="modal-backdrop" id="referenceModal">
+    <div class="modal-card" style="max-width: 900px; padding: 20px;">
+      <h3 style="margin-bottom:15px;">Perbandingan Desain Asli (image_36db88.png)</h3>
+      <div style="width:100%; text-align:center; background:#fff; border-radius:18px; padding:10px; overflow:hidden; border: 1px solid #eee;">
+        <img src="image_36db88.png" alt="Reference Mockup" style="max-width:100%; max-height: 55vh; object-fit: contain; border-radius: 8px;">
+      </div>
+      <p style="text-align:center; font-size: 0.8rem; color:#8b92b6; margin: 12px 0 16px;">
+        Web di atas telah direkonstruksi penuh menggunakan arsitektur CSS modern dan efek pop sensorik nyata.
+      </p>
+      <button type="button" class="bubble-surface bubble-pill-btn" style="width:100%; text-align:center; background:#fff;" onclick="closeModal('referenceModal')">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <footer>dibuat dengan gelembung dan sedikit kilau</footer>
+
+  <script>
+    // Web Audio API Synthesizer pop sound effect
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playPopSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Frequency sweep for perfect water bubble "plop"
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } catch (e) {
+        console.warn("Audio Context blocked or not supported on this device.", e);
+      }
+    }
+
+    function spawnBurst(el) {
+      playPopSound();
+      const rect = el.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const colors = ['#c9b8f0', '#8fd8f5', '#c3f0b0', '#f5c2e0', '#ffffff'];
+
+      // Ring shockwave element
+      const ring = document.createElement('div');
+      ring.className = 'ring';
+      ring.style.left = cx + 'px';
+      ring.style.top = cy + 'px';
+      el.appendChild(ring);
+      setTimeout(() => ring.remove(), 550);
+
+      // Flying burst particles
+      const n = 12;
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement('div');
+        p.className = 'burst';
+        const angle = (Math.PI * 2 * i) / n + Math.random() * 0.4;
+        const dist = 35 + Math.random() * 35;
+        p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        p.style.background = colors[i % colors.length];
+        p.style.width = p.style.height = (4 + Math.random() * 5) + 'px';
+        el.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+      }
+    }
+
+    // Generic Pop Trigger for styling feedback
+    function pop(el) {
+      el.classList.remove('popped');
+      void el.offsetWidth; // Trigger reflow
+      el.classList.add('popped');
+      spawnBurst(el);
+    }
+
+    // Setuju Syarat & Ketentuan (Interactive custom widgets)
+    let isTermsAgreed = false;
+    const realCheckbox = document.getElementById('termsChecked');
+
+    function setTermsState(checked, triggerEl) {
+      isTermsAgreed = checked;
+      realCheckbox.checked = checked;
+
+      const odpWidget = document.getElementById('checkboxOdp');
+      const dipilihWidget = document.getElementById('checkboxDipilih');
+      const popTooltip = document.getElementById('popTooltip');
+
+      if (checked) {
+        odpWidget.className = "bubble-checkbox-btn odp";
+        dipilihWidget.className = "bubble-checkbox-btn dipilih";
+        popTooltip.style.display = 'block';
+        setTimeout(() => { popTooltip.style.display = 'none'; }, 1200);
+        spawnBurst(dipilihWidget);
+      } else {
+        odpWidget.className = "bubble-checkbox-btn dipilih"; // shows checking state as odp active
+        odpWidget.style.background = 'linear-gradient(135deg, #a2d6f5, #8fd8f5)';
+        dipilihWidget.className = "bubble-checkbox-btn odp";
+        spawnBurst(odpWidget);
+      }
+    }
+
+    // Pilih Paket (Radio Buttons)
+    let selectedPaketVal = 'B'; // default
+    function selectPaket(paketCode, rowEl) {
+      const group = document.getElementById('paketRadioGroup');
+      group.querySelectorAll('.bubble-radio').forEach(r => r.classList.remove('on'));
+      
+      const radioBox = rowEl.querySelector('.bubble-radio');
+      radioBox.classList.add('on');
+      selectedPaketVal = paketCode;
+      spawnBurst(radioBox);
+    }
+
+    // Contoh Slider Progress Update & Bubble Floating Tooltip
+    function updateSliderProgress(slider) {
+      const val = slider.value;
+      const display = document.getElementById('sliderValDisplay');
+      display.textContent = val;
+
+      // Calculate track width percentages accurately to slide the bubble value along with thumb
+      const min = slider.min ? slider.min : 1;
+      const max = slider.max ? slider.max : 10;
+      const percent = ((val - min) / (max - min)) * 100;
+      
+      // Fine-tuned sliding offsets
+      display.style.left = `calc(${percent}% - ${percent * 0.04}px)`;
+    }
+
+    // Trigger initial progress alignment on load
+    updateSliderProgress(document.getElementById('sliderRange'));
+
+    // Minat / Hobi Tags Toggler
+    const selectedHobbies = new Set(['Membaca', 'Musik']); // default selected
+    function toggleHobby(hobbyName, el) {
+      el.classList.toggle('selected');
+      if (selectedHobbies.has(hobbyName)) {
+        selectedHobbies.delete(hobbyName);
+      } else {
+        selectedHobbies.add(hobbyName);
+      }
+      spawnBurst(el);
+    }
+
+    // Avatar Upload helper functions
+    function triggerAvatarUpload(el) {
+      spawnBurst(el);
+      document.getElementById('realFileInput').click();
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('avatarPreview');
+          const placeholder = document.getElementById('uploadPlaceholder');
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          placeholder.style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // General Form Submission Success logic
+    function handleDaftarSubmit(event) {
+      event.preventDefault();
+
+      if (!isTermsAgreed) {
+        // Shake feedback for Syarat & Ketentuan if not checked
+        const dip = document.getElementById('checkboxDipilih');
+        dip.style.borderColor = '#ff7bb3';
+        dip.style.animation = 'popShrink 0.3s ease';
+        playPopSound();
+        setTimeout(() => {
+          dip.style.borderColor = 'var(--bubble-border)';
+          dip.style.animation = 'none';
+        }, 400);
+        return;
+      }
+
+      // Gather summaries
+      document.getElementById('resName').textContent = document.getElementById('fullname').value;
+      document.getElementById('resEmail').textContent = document.getElementById('email').value;
+      document.getElementById('resPaket').textContent = "Paket " + selectedPaketVal;
+      document.getElementById('resSlider').textContent = document.getElementById('sliderRange').value;
+      document.getElementById('resCountry').textContent = document.getElementById('countrySelect').value;
+      
+      const hobbiesArr = Array.from(selectedHobbies);
+      document.getElementById('resHobbies').textContent = hobbiesArr.length > 0 ? hobbiesArr.join(', ') : 'Tidak ada';
+
+      // Show dialog modal
+      openModal('successModal');
+    }
+
+    // Reset Form to initial default values
+    function handleResetForm(btn) {
+      pop(btn);
+      document.getElementById('bubbleRegisterForm').reset();
+      
+      // Reset custom inputs state to default mock-up conditions
+      setTermsState(false, document.getElementById('checkboxOdp'));
+      selectPaket('B', document.getElementById('paketRadioGroup').children[1]);
+      
+      // Reset file upload
+      document.getElementById('avatarPreview').style.display = 'none';
+      document.getElementById('uploadPlaceholder').style.display = 'flex';
+
+      // Reset slider progress
+      const slider = document.getElementById('sliderRange');
+      slider.value = 7;
+      updateSliderProgress(slider);
+
+      // Reset hobbies selection tags
+      selectedHobbies.clear();
+      selectedHobbies.add('Membaca');
+      selectedHobbies.add('Musik');
+      document.querySelectorAll('.bubble-tag').forEach(tag => {
+        const name = tag.textContent.trim();
+        if (name === 'Membaca' || name === 'Musik') {
+          tag.classList.add('selected');
+        } else {
+          tag.classList.remove('selected');
+        }
+      });
+    }
+
+    // Simulating back button popped warning banner
+    function handleKembaliClick(btn) {
+      pop(btn);
+      const notification = document.createElement('div');
+      notification.style.position = 'fixed';
+      notification.style.top = '25px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.background = '#ffffff';
+      notification.style.border = '2px solid rgba(143, 216, 245, 0.8)';
+      notification.style.padding = '12px 24px';
+      notification.style.borderRadius = '999px';
+      notification.style.boxShadow = '0 10px 25px rgba(106, 90, 205, 0.2)';
+      notification.style.zIndex = '9999';
+      notification.style.fontWeight = '700';
+      notification.style.color = '#31366b';
+      notification.innerHTML = '⬅️ Tombol Kembali Ditekan!';
+      
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 2500);
+    }
+
+    // Modals visibility toggler
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('open');
+      playPopSound();
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('open');
+      playPopSound();
+    }
+
+    function toggleReferenceModal(btn) {
+      pop(btn);
+      setTimeout(() => openModal('referenceModal'), 200);
+    }
+  </script>
+</body>
+</html>
