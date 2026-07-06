@@ -6,6 +6,7 @@ import Section2 from './sections/Section2';
 import Section3 from './sections/Section3';
 import Section4 from './sections/Section4';
 import BubbleButton from './ui/BubbleButton';
+import { supabase } from '../lib/supabaseClient';
 
 gsap.registerPlugin(useGSAP);
 
@@ -21,7 +22,7 @@ const INITIAL_FORM = {
   school: '',
   birthDate: '',
   whatsapp: '',
-  subjects: '',
+  subjects: [],
   interests: [],
   motivation: '',
 };
@@ -33,7 +34,7 @@ function validateStep(step, form) {
     case 1:
       return form.whatsapp.trim().length >= 10;
     case 2:
-      return form.subjects.trim() && form.interests.length > 0;
+      return form.subjects.length > 0 && form.interests.length > 0;
     case 3:
       return form.motivation.trim().length >= 10;
     default:
@@ -44,6 +45,8 @@ function validateStep(step, form) {
 export default function RegistrationForm({ onSuccess }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const contentRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -60,10 +63,35 @@ export default function RegistrationForm({ onSuccess }) {
     if (step > 0) setStep(s => s - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep(3, form)) return;
-    if (onSuccess) onSuccess(form);
+    
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const { error } = await supabase
+      .from('registrations')
+      .insert([
+        {
+          full_name: form.fullName,
+          school: form.school,
+          birth_date: form.birthDate,
+          whatsapp: form.whatsapp,
+          subjects: form.subjects,
+          interests: form.interests,
+          motivation: form.motivation,
+        }
+      ]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+      setSubmitError('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+      console.error(error);
+    } else {
+      if (onSuccess) onSuccess(form);
+    }
   };
 
   useGSAP(() => {
@@ -111,8 +139,8 @@ export default function RegistrationForm({ onSuccess }) {
           </BubbleButton>
 
           {isLast ? (
-            <BubbleButton type="submit" variant="cta">
-              Submit
+            <BubbleButton type="submit" variant="cta" disabled={isSubmitting}>
+              {isSubmitting ? 'Mengirim...' : 'Submit'}
             </BubbleButton>
           ) : (
             <BubbleButton type="button" variant="cta" onClick={goNext}>
@@ -120,6 +148,9 @@ export default function RegistrationForm({ onSuccess }) {
             </BubbleButton>
           )}
         </div>
+        {submitError && (
+          <p className="text-red-400 text-sm text-center mt-4">{submitError}</p>
+        )}
       </form>
     </div>
   );
