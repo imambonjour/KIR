@@ -47,8 +47,10 @@ export default function RegistrationForm({ onSuccess }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [direction, setDirection] = useState(0);
   const contentRef = useRef(null);
   const containerRef = useRef(null);
+  const progressDotsRef = useRef([]);
 
   const updateField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -56,11 +58,17 @@ export default function RegistrationForm({ onSuccess }) {
 
   const goNext = () => {
     if (!validateStep(step, form)) return;
-    if (step < STEPS.length - 1) setStep(s => s + 1);
+    if (step < STEPS.length - 1) {
+      setDirection(1);
+      setStep(s => s + 1);
+    }
   };
 
   const goBack = () => {
-    if (step > 0) setStep(s => s - 1);
+    if (step > 0) {
+      setDirection(-1);
+      setStep(s => s - 1);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -94,12 +102,59 @@ export default function RegistrationForm({ onSuccess }) {
     }
   };
 
+  // Animate progress dots on step change
   useGSAP(() => {
-    gsap.fromTo(
-      contentRef.current,
-      { y: 20, autoAlpha: 0 },
-      { y: 0, autoAlpha: 1, duration: 0.45, ease: 'power3.out' }
-    );
+    progressDotsRef.current.forEach((dot, i) => {
+      if (i < step) {
+        gsap.to(dot, { scale: 1, backgroundColor: 'rgba(255, 255, 255, 0.4)', duration: 0.3 });
+      } else if (i === step) {
+        gsap.to(dot, { 
+          width: 28, 
+          borderRadius: '999px', 
+          backgroundColor: 'rgba(255, 255, 255, 0.55)',
+          boxShadow: '0 2px 10px rgba(255, 255, 255, 0.4)',
+          duration: 0.4, 
+          ease: 'back.out(1.7)' 
+        });
+      } else {
+        gsap.to(dot, { 
+          width: 10, 
+          borderRadius: '50%', 
+          backgroundColor: 'rgba(255, 255, 255, 0.25)',
+          boxShadow: 'none',
+          duration: 0.3 
+        });
+      }
+    });
+  }, { scope: containerRef, dependencies: [step] });
+
+  // Enhanced step transition animation with slide effect
+  useGSAP(() => {
+    const ctx = gsap.context(() => {
+      const content = contentRef.current;
+      if (!content) return;
+
+      const slideDirection = direction;
+      const fromX = slideDirection > 0 ? 60 : -60;
+      const toX = slideDirection > 0 ? -60 : 60;
+
+      // Slide out old content
+      gsap.to(content, {
+        x: toX,
+        autoAlpha: 0,
+        duration: 0.25,
+        ease: 'power2.in',
+        onComplete: () => {
+          // Slide in new content
+          gsap.fromTo(content,
+            { x: fromX, autoAlpha: 0 },
+            { x: 0, autoAlpha: 1, duration: 0.4, ease: 'power3.out' }
+          );
+        }
+      });
+    }, { scope: containerRef });
+
+    return () => ctx.revert();
   }, { scope: containerRef, dependencies: [step] });
 
   const CurrentSection = STEPS[step].component;
@@ -114,6 +169,7 @@ export default function RegistrationForm({ onSuccess }) {
         {STEPS.map((s, i) => (
           <div
             key={s.title}
+            ref={el => progressDotsRef.current[i] = el}
             className={`step-dot${i === step ? ' active' : ''}${i < step ? ' done' : ''}`}
           />
         ))}
