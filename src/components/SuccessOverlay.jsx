@@ -36,6 +36,23 @@ export default function SuccessOverlay({ isVisible }) {
         <p style={{ marginTop: 8, fontSize: '0.85rem', fontStyle: 'italic' }}>
           Selamat datang di dunia sains!
         </p>
+        <a
+          href="https://chat.whatsapp.com/G9nnBt4ZAThEwV8ZT9mR5C"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="soap-bubble-btn soap-bubble-btn--cta"
+          style={{
+            width: 140,
+            height: 54,
+            borderRadius: 999,
+            marginTop: 24,
+            textDecoration: 'none',
+            animation: 'bubbleWobble 3.5s ease-in-out infinite',
+          }}
+        >
+          <span className="soap-bubble-shine" />
+          <span className="soap-bubble-inner">Join Grup WhatsApp</span>
+        </a>
       </div>
     </div>
   );
